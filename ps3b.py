@@ -239,6 +239,9 @@ class ResistantVirus(SimpleVirus):
         """
 
         # TODO
+        SimpleVirus.__init__(self, maxBirthProb, clearProb)
+        self.resistances = resistances.copy()
+        self.mutProb = mutProb
 
 
     def getResistances(self):
@@ -246,12 +249,14 @@ class ResistantVirus(SimpleVirus):
         Returns the resistances for this virus.
         """
         # TODO
+        return self.resistances
 
     def getMutProb(self):
         """
         Returns the mutation probability for this virus.
         """
         # TODO
+        return self.mutProb
 
     def isResistantTo(self, drug):
         """
@@ -266,6 +271,10 @@ class ResistantVirus(SimpleVirus):
         """
         
         # TODO
+        try :
+            return self.getResistances()[drug]
+        except KeyError:
+            return False
 
 
     def reproduce(self, popDensity, activeDrugs):
@@ -314,9 +323,20 @@ class ResistantVirus(SimpleVirus):
         """
 
         # TODO
+        for drug in activeDrugs :
+            if not self.isResistantTo(drug) :
+                raise NoChildException
+        
+        if random.random() < self.getMaxBirthProb() * float(1 - popDensity):
+            temp_resistances = self.getResistances().copy()
+            for k in temp_resistances :
+                if random.random() < self.getMutProb() :
+                    temp_resistances[k] = not temp_resistances[k]
+            return ResistantVirus(self.getMaxBirthProb(), self.getClearProb(), temp_resistances, self.getMutProb())
+        else :
+            raise NoChildException
 
             
-
 class TreatedPatient(Patient):
     """
     Representation of a patient. The patient is able to take drugs and his/her
