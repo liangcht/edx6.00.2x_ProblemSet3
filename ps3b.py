@@ -476,3 +476,29 @@ def simulationWithDrug(numViruses, maxPop, maxBirthProb, clearProb, resistances,
     """
 
     # TODO
+    v_populations = [0]*300
+    resist_v_populations = [0]*300
+    
+    for i in range(numTrials) :
+        viruses = [ResistantVirus(maxBirthProb, clearProb, resistances, mutProb)]*numViruses
+        patient = TreatedPatient(viruses, maxPop)
+
+        for j in range(150) :
+            v_populations[j] += patient.update()
+            resist_v_populations[j] += patient.getResistPop(['guttagonol'])
+        
+        patient.addPrescription('guttagonol')
+        for j in range(150, 300) :
+            v_populations[j] += patient.update()
+            resist_v_populations[j] += patient.getResistPop(['guttagonol'])
+            
+    avg_v_population = [ x/float(numTrials) for x in v_populations]
+    avg_resist_v_population = [ x/float(numTrials) for x in resist_v_populations]
+
+    pylab.plot(range(300), avg_v_population, label = 'total virus population')
+    pylab.plot(range(300), avg_resist_v_population, label = 'guttagonol-resistant virus population')
+    pylab.ylabel('average size of the virus population')
+    pylab.xlabel('time steps')
+    pylab.title('Simple simulation with drugs')
+    pylab.legend(loc='best')
+    pylab.show()
